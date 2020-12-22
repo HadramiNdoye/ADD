@@ -1,0 +1,43 @@
+---
+title: "TP_2"
+author: "EL_Hadrami"
+date: "23/10/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(FactoMineR)
+library(factoextra)
+```
+
+```{r}
+datapn <- read.delim(file="/home/ndoye/Analyse_données/TP_M1MIASHS_AD/TP_2/data/Poids_naissance.txt",sep=";")
+summary(datapn)
+pca <- PCA(datapn, scale.unit = TRUE,graph=FALSE)
+fviz_pca_ind (pca)
+```
+
+
+```{r}
+datapn$LWT <- datapn$LWT * 0.45359237
+datapn$BWT <- datapn$BWT / 1000
+```
+
+```{r}
+y <- datapn$BWT
+x <- datapn$LWT
+reg <- lm(y~x) 
+summary(reg)
+plot(x,y,col="red")
+abline(reg,col="blue")
+anova(reg)
+df <- data.frame(56)
+predict(reg,56)
+```
+
+$\textbf{Devoir}$
+ 
+

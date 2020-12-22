@@ -1,0 +1,286 @@
+  ---
+title: "Devoir_2"
+author: "EL_Hadrami"
+date: "10/11/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+$\underline{\text{Exercice.13}}$
+
+```{r}
+# Creation d'un data-frame "acteur"
+Mort.à <- c(93,53,72,68,68,53)
+Années.de.carrière <- c(66,25,48,37,31,32)
+Nombre.de.films <- c(211,58,98,140,74,81)
+Prénom <- c("Michel","André","Jean","Louis","Lino","Jacques")
+Nom <- c("Galabru","Raimbourg","Gabin","De Funès","Ventura","Villeret")
+Date.du.décès <- c("04-01-2016","23-09-1970","15-10-1976","27-01-1983","22-10-1987","28-01-2005")
+data.acteur <- data.frame(Mort.à,Années.de.carrière,Nombre.de.films,Prénom,Nom,Date.du.décès)
+ #utilisation d'un dplyer pour renommer la premiere variable
+data.acteur.r <- rename(data.acteur,"Age.du.décès"=Mort.à)
+# extraction de la colonne Prénom
+prenom.extract <- data.acteur$Prénom
+data.acteur.arrange <- arrange(data.acteur.r,Age.du.décès)
+```
+
+$\underline{\text{Exercice.14}}$
+
+$\textbf{Question 1.}$
+```{r}
+w <-read.delim(file="/home/ndoye/M1_SSD/Analyse_données/TP_M1MIASHS_AD/TP_2/data/fromages1-TP-M1.txt")
+```
+
+$\textbf{Question 2.}$
+
+```{r}
+w <- rename(w,"mean.score"=Y,"c.a.a"=X1,"c.h.s"=X2,"c.a.l"=X3)
+w$X1
+```
+
+$\textbf{Question 3.}$:Les caracteristiques de w:
+
+```{r}
+print(w)
+```
+
+$\textbf{Question 4.}$:Les parametres statistiques des variables
+
+```{r}
+summary(w)
+```
+$\textbf{Question 5.}$:
+
+```{r}
+pairs(w)
+```
+
+la commande pairs permet de tracer une nuage de point pour chaque variable afin de voir les differentes correlations qui peuvent exister
+
+$\textbf{Question 6.}$:Construction d'une nouvelle data frame
+
+```{r}
+nv.c.a.a <- c(w$c.a.a[w$c.a.a > 5.1],rep(NA,6))
+nv.c.a.l <- c(w$c.a.l[w$c.a.l < 1.77],rep(NA,5))
+ww <- data.frame(w$mean.score,nv.c.a.a,w$c.h.s,nv.c.a.l)
+ww <- rename(ww,"mean.score"=w.mean.score,"c.a.a"=nv.c.a.a,"c.h.s"=w.c.h.s,"c.a.l"=nv.c.a.l)
+```
+
+$\textbf{Question 7.}$: Les caracteristiques de ww
+
+```{r}
+print(ww)
+```
+
+$\textbf{Question 8.}$: Les parametres statistiques de la variable ww
+
+```{r}
+summary(ww)
+```
+
+$\underline{\text{Exercice 15.}}$
+
+$1.\\$
+```{r}
+data(airquality) # charger les donées airquality  
+df.airquality <- data.frame(airquality)
+```
+
+$2. \text{Affichage des noms des variables}$
+```{r}
+names(df.airquality)
+```
+
+$3 .\text{nombre de ligne et de colonne}$
+
+```{r}
+nrow(df.airquality)
+ncol(df.airquality)
+```
+
+$4 .\text{Les parametres statistiques}$
+
+```{r}
+summary(df.airquality)
+```
+$5 .\text{representation de la boite a moustache}$
+
+```{r}
+boxplot(df.airquality$Ozone~df.airquality$Month)
+```
+
+$6 .\text{Creation d'une variable qualitative "saison"}$
+
+```{r}
+saison <-factor(df.airquality$Month,levels=c(5:9))
+levels(saison)[levels(saison)==5] <- "printemps"
+levels(saison)[levels(saison)==6] <- "éte"
+levels(saison)[levels(saison)==7] <- "éte"
+levels(saison)[levels(saison)==8] <- "éte"
+levels(saison)[levels(saison)==9] <- "automne"
+df.airquality$season = saison
+```
+
+$7 .$
+
+```{r}
+g <- ggplot(data = df.airquality) + 
+  geom_point(mapping = aes(x =Temp, y = Ozone, shape = saison,color=saison)) + scale_shape_manual(values=c(3, 16, 17))+
+  ggtitle("Ozone en fonction des saisons")
+g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
+```
+
+$\underline{\text{Exercice 16}}$
+
+$\text{1.Simulation de 100 valeurs suivant une loi normale}$
+
+```{r}
+n <- 100
+e <- rnorm(n,0,25)
+```  
+$2.$ Pour tout $i\in{1,\ldots,100}$,on pose $y_{i}=1.7 + 2.1 i + e_{i}\\$
+
+```{r}
+i <- c(1:100)
+yi <- 1.7 + 2.1 * i + e[i]
+```
+2.a et 2.b: $\text{representation d'un nuage de point et une droite} \ (i,y_{i})$
+
+```{r}
+data.f <- data.frame(i,yi)
+g <- ggplot(data = data.f) +
+geom_point(mapping = aes(x = i, y = yi),colour="blue") +
+geom_smooth(mapping = aes(x = i, y = yi),se = FALSE,colour="red",fill="red",method = lm) +
+ggtitle("nuage de points et sa droite de regression")
+g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
+```
+
+$\underline{\text{Exercice 17}}$
+
+```{r}
+# Creation d'une matrice
+ligne1 <- c(68,119,26,7)
+ligne2 <- c(15,54,14,10)
+ligne3 <- c(5,29,14,16)
+ligne4 <- c(20,84,17,94)
+mat <- matrix(c(ligne1,ligne2,ligne3,ligne4),nrow = 4,ncol=4,byrow = T,dimnames = list(c("marron","noisette","vert","bleu"),c("brun", "chatin","roux","blond")))
+```
+
+$\textbf{2. Calculer la matrice des fréquences (arrondit au 100ème près)}$
+
+```{r}
+matfreq <- mat / sum(mat)
+round(matfreq*100,2)
+```
+
+3. les lois marginales (nommer c pour le vecteur colonne et r pour le vecteur
+ligne)
+
+```{r}
+l <- round(apply(matfreq,1,sum),2)
+c <- round(apply(matfreq,2,sum),2)
+```
+
+4.Profils lignes
+
+```{r}
+L <- round(sweep(mat,1,rowSums(mat),'/'),2)
+```
+
+5.Profils colonnes
+
+```{r}
+C <- round(sweep(mat,2,colSums(mat),'/'),2)
+```
+
+6. La distance de chi-deux entre les profils lignes
+
+```{r}
+d.chi <- 0
+distancechideux <- function(L){
+  for(i in 1:nrow(L)-1){
+    
+    d.chi <- d.chi + sum(((L[i,] - L[i+1,]) ^ 2) /c)
+  }
+  return (d.chi)
+}
+```
+
+7. la matrice des taux de liaison
+
+```{r}
+T <- round((matfreq - (l%*%t(c))) / (l%*%t(c)),2)
+```
+
+
+Exercice 18
+
+1.
+```{r}
+tableau <- matrix(c(290,410,110,190), ncol=2, byrow=TRUE)
+colnames(tableau) <- c("Bleu","Brun")
+rownames(tableau) <- c("Celib","Marie")
+tableau <- as.table(tableau)
+```
+
+2.
+```{r}
+print(tableau)
+barplot(tableau)
+```
+
+3. 
+```{r}
+n <- margin.table(tableau)
+m1 <- margin.table(tableau,1)
+m2 <- margin.table(tableau,2)
+prop.table(tableau)
+```
+4. Le test du chi-deux
+
+```{r}
+chisq.test(tableau)
+```
+4.a
+```{r}
+tab0 <- as.array(m1) %*% t(as.array(m2))/n
+tab0 <- as.table(tab0)
+```
+
+4.b
+
+```{r}
+```
+
+5.b
+
+```{r}
+tab1 <- as.matrix(tableau)
+tab1[2,1] <- tab1[1,1] + tab1[2,1]
+tab1[1,1] <- 0
+tab1[1,2] <- tab1[1,2] + tab1[2,2]
+tab1[2,2] <- 0
+tab1tab <- as.matrix(tab1)
+chisq.test(tab1tab)
+```
+
+```{r}
+data(HairEyeColor)
+dfH <- as.data.frame(HairEyeColor)
+tH <- xtabs(Freq~Hair+Eye,dfH)
+chisq.test(tH)
+data(Titanic)
+dfT <- as.data.frame(Titanic)
+data(UCBAdmissions)
+dfU <- as.data.frame(UCBAdmissions)
+chisq.test(as.table(dfH))
+```
+
