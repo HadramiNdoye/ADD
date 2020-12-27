@@ -1,0 +1,163 @@
+---
+title: "Devoir_4"
+author: "EL_Hadrami"
+date: "25/12/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("FactoMineR")
+library("factoextra")
+library("corrplot")
+library("ca")
+```
+
+$\text{1.Chargement des données smoke}$
+
+```{r}
+datasmoke <- ca::smoke
+datasmoke
+```
+
+$\text{AFC et SVD généralisée}$
+  
+```{r}
+f <- as.matrix(datasmoke) / sum(datasmoke)
+# distribution marginale ligne et colonne
+r <- apply(f,1,sum)
+c <- apply(f,2,sum)
+# matrice Z
+Z <- (f-r%*%t(c))/r%*%t(c)
+```
+
+$\text{Creation de la fonction gsvd}$
+
+```{r}
+gsvd <- function(Z,r,c){
+  #Z matrice numerique de dimension (n,p) et de rang k
+  #r poids de la metrique des lignes N=diag(r)
+  # c poids de la metrique des colonnes M=diag(c)
+  #-----sortie---------------
+  # d vecteur de taille k contenant les valeurs singulieres (racines carres des valeurs propres)
+  # U matrice de dimension (n,k) des vecteurs propres de de ZMZ'N
+  # V matrice de dimension (p,k) des vecteurs propres de de Z'NZM
+  k <-qr(Z)$rank
+  colnames<-colnames(Z)
+  rownames<-rownames(Z)
+  Z <-as.matrix(Z)
+  Ztilde <-diag(sqrt(r)) %*% Z %*%diag(sqrt(c))
+  e <-svd(Ztilde)
+  U <-diag(1/sqrt(r))%*%e$u[,1:k]# Attention : ne s'ecrit comme cela que parceque N et M sont diagonales!
+  V <-diag(1/sqrt(c))%*%e$v[,1:k]
+  d <- e$d[1:k]                                              
+  rownames(U) <- rownames
+  rownames(V) <- colnames
+  if(length(d)>1)
+    colnames(U) <-colnames(V) <-paste("dim", 1:k, sep = "")
+  return(list(U=U,V=V,d=d))
+}
+```
+$\text{Calcul de X(profil ligne), Y(profil colonne) et d}$
+
+```{r}
+U <- gsvd(Z,r,c)$U
+V <- gsvd(Z,r,c)$V
+d <- gsvd(Z,r,c)$d
+# Utilsation de la commande sweep pour calculer les cordonnés X et Y
+X <- sweep(U,2,d,'*')
+Y <- sweep(V,2,d,'*')
+```
+
+$\text{Representation de X et Y sur le premier plan de l'AFC}$
+
+
+```{r}
+plot(X[,1:2],xlab="dim 1",ylab="dim 2",xlim=c(-0.4,0.4),ylim=c(-0.4,0.4),col="blue",main="Premier plan factoriel")
+abline(v = 0, lty = 2)
+abline(h = 0, lty = 2)
+text(X[,1:2],rownames(datasmoke),col="blue",pos=4)
+points(Y[,1:2],pch=2,col=2)
+text(Y[,1:2],colnames(datasmoke),pos=4,col=2)
+```
+
+
+$\text{Le pourcentage d’inertie expliquée par le premier plan factoriel de l’AFC}$
+
+```{r}
+IT <-sum(d^2) #Inertie totale
+d[1:2]^2/IT*100 #pourcentage d'inertie des axes
+sum(d[1:2]^2/IT)*100#pourcentage d'inertie du plan
+```
+
+$\text{Les deux premières dimensions de l'AFC donnent}$ 99.51\% $\text{de la variation, donc le premier plan factoriel de L'AFC peut etre acceptés}$
+
+3. Retrouvons ces résultats avec le package FactoMineR et la fonction CA
+
+```{r}
+afc <- CA(datasmoke,graph = FALSE)
+afc$eig
+row <- get_ca_row(afc)
+row$coord # matrice X
+col <- get_ca_col(afc)
+col$coord # matrice Y
+# representation de profil ligne(X) et profil colonne sur le plan
+plot(afc) 
+```
+
+$\textbf{Exercice 2:Données textuelles}$
+
+$\text{Chargement du jeux de données}$
+
+```{r}
+dataw <- read.csv("data/writers.csv",header = TRUE,row.names = 1)
+head(dataw,4)
+summary(dataw)
+```
+$\text{Test de khi-deux}$
+
+```{r}
+dataextr <- dataw[1:15,1:15]
+chisq.test(dataextr)
+```
+$\text{Decision}\\\\$
+
+Le p-value est inferieur au seuil $\alpha=0.05$ donc il y a une difference significative sur les distributions des lettres qui differe d'un echantillon a l'autre.
+
+$\text{Realisation d'une ACP}$
+
+```{r}
+caw1 <- CA(dataextr,graph = FALSE)
+caw1$eig
+plot(caw1)
+```
+
+$\text{AFC en ajoutant les deux textes inconnus en lignes supplémentaires}$
+
+```{r}
+caw2 <- CA(dataw,row.sup=c(15,16),graph = FALSE)
+caw2$eig
+plot(caw2,col.row.sup=3)
+```
+
+$\text{Classification ascendante hiérarchique de Ward}$
+
+```{r}
+#matrice des coordonnees factorielles sur 4 dimensionsX
+mcf <- rbind(caw2$row$coord[,1:4],caw2$row.sup$coord[,1:4])
+#matrice de distance euclidiennes entre les 17 echantillons
+d <-dist(mcf)
+#CAH
+tree <-hclust(d,method="ward.D2")
+plot(tree,hang=-1)
+```
+
+
+```{r}
+#partition en 4 classes
+cutree(tree,k=4)
+```
+

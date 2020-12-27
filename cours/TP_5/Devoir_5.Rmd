@@ -1,0 +1,24 @@
+---
+title: "Devoir_5"
+author: "EL_Hadrami"
+date: "27/12/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("FactoMineR")
+library("factoextra")
+library("corrplot")
+library("ca")
+library("readxl")
+```
+
+```{r}
+chiendata <- read_xlsx("data/chiens.xlsx")
+head(chiendata)
+```
+

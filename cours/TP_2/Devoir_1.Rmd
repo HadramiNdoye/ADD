@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
   ---
 title: "Devoir_2"
 author: "EL_Hadrami"
@@ -11,6 +16,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
+library(readxl)
+library(gplots)
 ```
 
 
@@ -36,7 +43,7 @@ $\underline{\text{Exercice.14}}$
 
 $\textbf{Question 1.}$
 ```{r}
-w <-read.delim(file="/home/ndoye/M1_SSD/Analyse_données/TP_M1MIASHS_AD/TP_2/data/fromages1-TP-M1.txt")
+w <-read.delim(file="data/fromages1-TP-M1.txt")
 ```
 
 $\textbf{Question 2.}$
@@ -52,7 +59,7 @@ $\textbf{Question 3.}$:Les caracteristiques de w:
 print(w)
 ```
 
-$\textbf{Question 4.}$:Les parametres statistiques des variables
+$\textbf{Question 4}$:Les parametres statistiques des variables
 
 ```{r}
 summary(w)
@@ -217,11 +224,11 @@ distancechideux <- function(L){
 7. la matrice des taux de liaison
 
 ```{r}
-T <- round((matfreq - (l%*%t(c))) / (l%*%t(c)),2)
+t <- round((matfreq - (l%*%t(c))) / (l%*%t(c)),2)
 ```
 
 
-Exercice 18
+$\textbf{Exercice 18}$
 
 1.
 ```{r}
@@ -272,6 +279,8 @@ tab1tab <- as.matrix(tab1)
 chisq.test(tab1tab)
 ```
 
+$\underline{\text{6. Test de khi-deux sur quelques echantillons de R}}$
+
 ```{r}
 data(HairEyeColor)
 dfH <- as.data.frame(HairEyeColor)
@@ -279,8 +288,87 @@ tH <- xtabs(Freq~Hair+Eye,dfH)
 chisq.test(tH)
 data(Titanic)
 dfT <- as.data.frame(Titanic)
+dfTtab <- xtabs(Freq~Sex+Survived,dfT)
+chisq.test(dfTtab)
 data(UCBAdmissions)
 dfU <- as.data.frame(UCBAdmissions)
-chisq.test(as.table(dfH))
+dfUtab <- xtabs(Freq~Admit+Gender,dfU)
+chisq.test(as.table(dfUtab))
 ```
+
+$\textbf{Exercice 19}$
+
+```{r}
+data(cars)
+# regression lineaire 
+reg <- lm(dist~speed,cars)
+summary(reg)
+plot(cars)
+abline(reg,col="red")
+#abline(reg$coefficients,col="yellow")
+```
+$\text{19.a: La valeur prédite pour une vitesse de 20}$
+
+```{r}
+predict(reg,newdata = data.frame(speed=20))
+```
+
+$\underline{\text{Exercice 20}}$
+
+$\text{declaration des données}$
+
+```{r}
+x <- c(3,6,9,12,15,18,21,24)
+y <- c(20,50,40,70,40,60,50,80)
+reg1 <- lm(x~y)
+plot(x,y)
+abline(reg2)
+```
+
+```{r}
+reg2 <- lm(x~y)
+plot(y,x)
+abline(reg2)
+```
+le coefficient de correlation entre x et y
+
+```{r}
+cor(x,y)
+fisher.test(x,y)
+```
+
+
+$\underline{\text{Exercice 21}}$
+
+```{r}
+y <- c(85,70,100,140,115,105)
+x1 <- c(3,5,9,12,14,17)
+x2 <- c(11,14,15,16,19,23)
+regm <- lm(y~x1+x2)
+anova(regm)
+```
+
+$\underline{\text{Exercice 22}}$
+
+```{r}
+# load data
+data <- read_excel("data/Donnees-TP2-M1-MIASHS.xls")
+summary(data)
+```
+$\text{Tableau de contigence}$
+
+```{r}
+tabc1 <- table(data$Sexe,data$Diplome)
+tabc2 <- round(prop.table(tabc1),2)
+tabc3 <- tabc2*100
+```
+$\text{Representation graphique}$
+
+```{r}
+balloonplot(tabc1)
+ggplot(data=data.frame(tabc1)) + geom_bar(stat="identity",mapping = aes(x = Var2,y = Freq,fill=Var1))+xlab("Diplome") + ylab("Total H/F") + ggtitle("Diagramme en baton")
+```
+
+
+
 
