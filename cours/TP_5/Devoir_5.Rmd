@@ -17,8 +17,154 @@ library("ca")
 library("readxl")
 ```
 
+$\text{Chargement du jeux de données}$
+
 ```{r}
-chiendata <- read_xlsx("data/chiens.xlsx")
-head(chiendata)
+load("data/chiens.rda")
+# chiendata <- read_xlsx("data/chiens.xlsx",col_names = FALSE)
+# chiendata <- as.matrix(chiendata)
+# chiendata[,1]
+# chiendataextr <- as.matrix(chiendata[,2:8])
+# rownames(chiendataextr) <- chiendata[,1]
+# colnames(chiendataextr) <- c("taille","Poids","Veloc","Intell","Affec","Agress","Role")
+# chiendataextr <- as.data.frame(chiendataextr)
+head(chiens,4)
+class(chiens)
+```
+$\text{Realisation d'une ACM}$
+
+```{r}
+H <- chiens[,1:6]
+# tableau disjonctif
+tabd <- tab.disjonctif(H)
+tabd <- as.matrix(tabd)
+f <- tabd / sum(tabd)
+r <- apply(f,1,sum)
+c <- apply(f,2,sum)
+# matrice de Z
+Z <- diag(1/r)%*%(f-r%*%t(c))%*%diag(1/c)
+source("GSVD.R")
+U <- gsvd(Z,r,c)$U
+V <- gsvd(Z,r,c)$V
+d <- gsvd(Z,r,c)$d
+```
+
+$\text{3.b}$
+
+```{r}
+# inertie totale
+it <- sum(d^2)
+it
+m <- ncol(tabd)
+p <- ncol(H)
+(m / p) - 1 
+```
+
+$\text{Ce qui montre que l'inertie total vaut} \ \frac{m}{p} - 1 \ \text{avec m le nombre de modalité et p le nombre de variable qualitative}$
+
+$\text{3.c}$
+
+```{r}
+d # les valeurs propres sur chaque dimension
+length(d)
+n <- nrow(H)
+min(n - 1, m - p)
+```
+
+$\text{3.d}$
+
+```{r}
+pi <- d^2/it*100 #pourcentage d'inertie des axes
+barplot(pi,names.arg=1:length(d),xlab="dim",ylab="pourcentage d'inertie expliquée",col="blue",main="diagramme en barre de pourcentage d'inertie")
+```
+
+$\text{3.e}$
+
+```{r}
+X <- sweep(U,2,d,'*')
+X <- X[,1:3]
+Y <- sweep(V,2,d,'*')
+Y <- Y[,1:3]
+rownames(X) <- as.matrix(rownames(chiens))
+rownames(Y) <- as.matrix(colnames(tabd))
+```
+
+$\textbf{3.f plot des individus et des modalités dans le premier plan factoriel}$
+
+```{r}
+xmin <-min(X[,1])
+xmax <-max(X[,1])
+xlim <-c(xmin, xmax)* 1.2
+ymin <-min(X[,2])
+ymax <-max(X[,2])
+ylim <- c(ymin, ymax)* 1.2
+pi2dim <- d[1:2]^2/it*100
+pi2dim <- round(pi2dim,2)
+xlab <- paste("Dim ", 1, " (", pi2dim[1], "%)", sep = "")
+ylab <- paste("Dim ", 2, " (", pi2dim[2], "%)", sep = "")
+plot(X[,1:2],xlab=xlab,ylab= ylab,xlim=xlim,ylim=ylim,col="blue",pch=20,main="Premier plan factoriel")
+abline(v = 0, lty = 2)
+abline(h = 0, lty = 2)
+text(X[,1:2],rownames(chiens),col="blue",pos=3)
+plot(Y[,1:2],xlab=xlab,ylab= ylab,xlim=xlim,ylim=ylim,col="blue",pch=17,main="Premier plan factoriel")
+abline(v = 0, lty = 2)
+abline(h = 0, lty = 2)
+text(Y[,1:2],colnames(tabd),col="blue",pos=3)
+```
+
+
+$\text{3.g}$
+
+```{r}
+moy <- apply(X[which(tabd[,3]==1),],2,mean)
+1/d[1:3] * moy # coordonné de Y 
+
+Y[3,]
+```
+
+$\text{3.h:Rapport de correlation entre la variable taille et les deux premieres composantes principale}$
+
+```{r} 
+eta <- function(x) {
+  # taille de l'echantillon du premier composante pour chaque modalité de la varoable taille
+  ns <- tapply(x, chiens$taille, "length")
+  xbarres <-  tapply(x, chiens$taille, "mean")
+  denom1 <- sum(ns * (xbarres - mean(x)) ^ 2)
+  denom2 <- var(x) * (length(x) - 1)
+  rappcorr <- denom1 / denom2
+  return (rappcorr)
+}
+xc1 <- as.data.frame(X)$dim1
+xc2 <- as.data.frame(X)$dim2
+# rapport de correlation pour la premiere composante avec la variable taille
+eta(xc1)
+# rapport de correlation pour la deuxieme composante avec la variable taille
+eta(xc2)
+```
+
+$\text{4}$
+
+$\text{4.a:Realisation d'une ACM}$
+
+```{r}
+acmchiens <- MCA(chiens,quali.sup = 7,graph = FALSE)
+```
+
+$\text{4.b}$
+
+```{r}
+head(acmchiens$ind$coord,4)
+head(X,4)
+head(acmchiens$var$coord,4)
+head(Y,4)
+plot(acmchiens,choix="ind",invisible = c("var","quali.sup"))
+plot(acmchiens,choix="ind",invisible="ind")
+```
+
+$\text{4.c}$
+
+```{r}
+acmchiens$var$eta[,1:2]
+plot(acmchiens,choix = "var")
 ```
 
