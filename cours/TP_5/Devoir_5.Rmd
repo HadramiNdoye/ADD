@@ -168,3 +168,37 @@ acmchiens$var$eta[,1:2]
 plot(acmchiens,choix = "var")
 ```
 
+$\text{4.d}$
+
+```{r}
+chienNA <- H
+chienNA[1,1] <- NA
+chienNA[2,2] <- NA
+mcachienna <- MCA(chienNA,graph = FALSE)
+plot(mcachienna,choix = "ind",invisible = "ind")
+```
+
+$\text{5.}$
+
+```{r}
+Htp <- subset(H,select = c(taille,poids))
+Htptabc <- table(Htp)
+# Realisation d'une AFC
+afctp <- CA(Htptabc,graph = FALSE)
+pt <- subset(chiens,select = c(taille,poids))
+ptafc <- MCA(pt,graph = FALSE)
+# valeur propre de l'ACF
+vpafc <- afctp$eig
+# valeur propre de l'ACM
+vpamc <- ptafc$eig
+vpafc
+vpamc
+(1 + sqrt(vpafc)) / 2
+(1 - sqrt(vpafc)) / 2
+```
+
+$\text{Ce qui montre que chaque valeur propre de L'ACF correspond a deux 
+valeurs propres de L'ACM}$
+
+
+
