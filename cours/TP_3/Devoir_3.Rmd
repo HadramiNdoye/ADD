@@ -159,7 +159,6 @@ du cercle de corrélation.}$
 ```{r}
 fviz_pca_var(pcaski, col.var = "cos2",gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),repel = TRUE)
 ```
-
 $\textbf{Contributions des variables}$
 
 ```{r}
@@ -191,8 +190,7 @@ fviz_contrib(pcaski, choice = "ind", axes = 1 :2)
 $$\textbf{Biplot}$$
 ```{r}
 fviz_pca_biplot(pcaski,
-repel = TRUE,
-col.var = "#2E9FDF", # Couleur des variables
+repel = TRUE,col.var = "#2E9FDF", # Couleur des variables
 col.ind = "#696969") # Couleur des individues )
 ```
 

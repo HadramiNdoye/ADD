@@ -1,0 +1,111 @@
+---
+title: "min_projet"
+author: "EL_Hadrami"
+date: "29/12/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("FactoMineR")
+library("factoextra")
+library("corrplot")
+library("fpc")
+```
+
+
+```{r}
+etudiants <- read.csv("data/etudiants.csv",header = TRUE,sep = ";")
+filiere <- etudiants[,1]
+etudiants <- as.matrix(etudiants[2:13])
+rownames(etudiants) <- filiere
+etudiants.active <- as.data.frame(etudiants[,1:6])
+head(etudiants.active,4)
+summary(etudiants.active)
+```
+
+$\textbf{Realisation d'une ACP}$
+
+```{r}
+#etudiants.active <- etudiants[,2:12]
+res.acp <- PCA(etudiants.active,scale.unit = TRUE,graph = FALSE)
+res.acp$eig
+```
+
+$\textbf{Graphe des valeurs propres}$
+
+```{r}
+fviz_eig(res.acp, addlabels = TRUE)
+```
+
+
+$\textbf{Contributions des variables}$
+
+```{r}
+fviz_contrib(res.acp, choice = "var", axes = 1 :2)
+```
+
+
+$\textbf{Graphiques des individus}$
+
+```{r}
+ind <- get_pca_ind(res.acp)
+fviz_pca_ind (res.acp, col.ind = "cos2",gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),repel = TRUE) 
+fviz_contrib(res.acp, choice = "ind", axes = 1 :2)
+```
+
+$\textbf{Graphiques des variables}$
+
+```{r}
+fviz_contrib(res.acp, choice = "ind", axes = 1 :2)
+```
+
+
+$\textbf{Graphiques des individus et des variables}$
+
+```{r}
+fviz_pca_biplot(res.acp,
+repel = TRUE,col.var = "#2E9FDF", # Couleur des variables
+col.ind = "#696969")
+```
+
+$\underline{\text{Classification hiérarchique ascendante des données}}$
+
+- Realisation d'un plot pour tous les individus
+
+```{r}
+plot(etudiants.active,col = "blue")
+```
+
+$\text{Utilisation de la fonction hclust pour la classification}$
+
+```{r}
+filiere <- c("Dsp","Seg","Aes","Lsla","L","Shs","p2lsh","Sfa","Snv","Staps")
+rownames(etudiants.active) <- filiere
+etudiants.cr <- scale(etudiants.active,center=T,scale=T)
+d.etudiants <- dist(etudiants.cr)
+tree <- hclust(d.etudiants,method = "ward.D2")
+plot(tree,hang = -1)
+print(sort(cutree(tree,k=6)))
+```
+
+$\text{Methode de K-means}$
+
+```{r}
+groupes.kmeans <- kmeans(etudiants.cr,centers=4,nstart=5)
+inertie <- rep(0,times=10)
+for (k in 2:10){
+  group <- kmeans(etudiants.cr,centers = k - 1,nstart=5)
+  inertie[k] <- group$betweenss/group$totss
+}
+plot(1:10,inertie,type="b",xlab="Nb. de groupes",ylab="% inertie expliquée")
+```
+
+```{r}
+sol.kmeans <- kmeansruns(etudiants.cr,krange=2:9,criterion="ch")
+plot(2:10,sol.kmeans$crit,type="b",xlab="Nb. de groupes",ylab="Silhouette")
+```
+

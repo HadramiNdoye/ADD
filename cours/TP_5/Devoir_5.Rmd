@@ -15,6 +15,7 @@ library("factoextra")
 library("corrplot")
 library("ca")
 library("readxl")
+library("missMDA")
 ```
 
 $\text{Chargement du jeux de données}$
@@ -200,5 +201,26 @@ vpamc
 $\text{Ce qui montre que chaque valeur propre de L'ACF correspond a deux 
 valeurs propres de L'ACM}$
 
+
+$\text{Exercice 28}$
+
+```{r}
+# chargement du jeux de données vnf
+data(vnf)
+dim(vnf)
+summary(vnf)
+```
+
+```{r,warning=FALSE}
+vnfacm <- MCA(vnf,graph = FALSE)
+plot(vnfacm,choix = "ind",invisible = "ind")
+# imputation dujeux de données pour enlever les valeurs manquantes
+complete <- imputeMCA(vnf,ncp=2)
+names(complete)
+head(complete$tab.disj,4)
+# Realisation d'une AMC apres avoir emputer les données manquantes
+mcanmv <- MCA(vnf,tab.disj = complete$tab.disj,graph = FALSE)
+plot(mcanmv,choix = "ind",invisible = "ind")
+```
 
 
