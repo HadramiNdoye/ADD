@@ -1,0 +1,61 @@
+---
+title: "Devoir_6"
+author: "EL_Hadrami"
+date: "30/12/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("FactoMineR")
+library("factoextra")
+library("corrplot")
+library("fpc")
+```
+
+$\text{Application de CAH et K-means sur laes données Dechathlon}$
+
+```{r}
+# chargement des données decathlon2
+data("decathlon2")
+decathlon2.active <- decathlon2[1:23,1:10]
+head(decathlon2.active,4)
+summary(decathlon2.active)
+```
+
+$\text{Realisation d'une CAH}$
+
+```{r}
+decathlon2.active.cr <- scale(decathlon2.active,center=T,scale=T)
+dist.dec2 <- dist(decathlon2.active.cr)
+clust.dc2 <- hclust(dist.dec2,method = "ward.D2")
+plot(clust.dc2)
+rect.hclust(clust.dc2,k=4)
+print(sort(cutree(clust.dc2,k=4)))
+```
+
+$\text{La methode de K-means}$
+
+```{r}
+groupes.kmeans <- kmeans(decathlon2.active.cr,centers=4,nstart=5)
+inertie <- rep(0,times=10)
+for (k in 1:10){
+  group <- kmeans(decathlon2.active.cr,centers = k,nstart=5)
+  inertie[k] <- group$betweenss/group$totss
+}
+plot(1:10,inertie,type="b",xlab="Nb. de groupes",ylab="% inertie expliquée")
+```
+
+```{r}
+sol.kmeans <- kmeansruns(decathlon2.active.cr,krange=2:10,criterion="ch")
+plot(1:10,sol.kmeans$crit,type="b",xlab="Nb. de groupes",ylab="Silhouette")
+```
+$\text{Realisation d'une ACP}$
+
+```{r}
+res.da <- PCA(decathlon2.active,scale.unit = TRUE,graph = FALSE)
+fviz_pca_biplot(res.da,repel = TRUE,col.var = "#2E9FDF", col.ind = "#696969")
+```

@@ -9,12 +9,27 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r,echo=FALSE}
+library("tidyverse")
+library("gplots")
 library("FactoMineR")
 library("factoextra")
 library("corrplot")
 library("fpc")
 ```
+
+Soient les noms suivants qui remplacera les variables du jeux de données dans la partie contribution des varaibles
+
+Dsc : Droit, sciences politiques
+Seg : Sciences economiques, gestion
+Aec : Administration economique et sociale
+Lsla : Lettres, sciences du langage, arts
+Shs : Sciences humaines et sociales
+L : Langues
+P2lsh : Pluri lettres langues sciences humaines
+Sfa : Sciences fondamentales et applications
+Dsp : Droit, sciences politiques
+Staps : Sciences et techniques des activites physiques et sportives
 
 
 ```{r}
@@ -40,27 +55,44 @@ $\textbf{Graphe des valeurs propres}$
 ```{r}
 fviz_eig(res.acp, addlabels = TRUE)
 ```
-
+Les deux premières composantes principales expliquent 89.24% de la variation,donc les deux premiers axes
+peuvent etre acceptés pour la suite de l'analyse.
 
 $\textbf{Contributions des variables}$
 
 ```{r}
 fviz_contrib(res.acp, choice = "var", axes = 1 :2)
 ```
+$\underline{\text{Observations}}$
 
+La ligne en pointillé rouge, sur le graphique ci-dessus, indique la contribution moyenne attendue.
+Donc les variables les plus contributives sont Master.H,Licence.F,Licence.H,Doctorat.H.
 
 $\textbf{Graphiques des individus}$
 
 ```{r}
-ind <- get_pca_ind(res.acp)
 fviz_pca_ind (res.acp, col.ind = "cos2",gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),repel = TRUE) 
-fviz_contrib(res.acp, choice = "ind", axes = 1 :2)
 ```
 
-$\textbf{Graphiques des variables}$
+$\underline{\text{Observation:}}$
+
+Un cos2 élevé indique une bonne représentation de l'individus  sur les axes principaux en considération(comme
+on peut le voir dans le graphe ci dessus).
+
+- Les individus ayant choisis les formations sciences humaines sociales et Droits sciences politique sont representés  sur le plan par des points de couleur semblable et sont proche l'un a l'autre, donc il forment un regroupement a deux individus, idem pour Aes,P2lsh et staps ce qui forme un autre regroupement de trois individus.
+
+
+- Les individus ayant choisis les formations Langues et Lsla sont representés sur le plan par des points de meme couleur et sont proche l'un a l'autre ce qui forme  un autre regroupement de deux individus.
+
+- Les individus ayant choisis les formations Snv, Seg et Sfa forment chacun un regroupement d'un seul individus.
+
+
 
 ```{r}
-fviz_contrib(res.acp, choice = "ind", axes = 1 :2)
+filiere <- c("Dsp","Seg","Aes","Lsla","L","Shs","p2lsh","Sfa","Snv","Staps")
+rownames(etudiants.active) <- filiere
+acp <- PCA(etudiants.active,scale.unit = TRUE,graph = FALSE)
+fviz_contrib(acp, choice = "ind", axes = 1 :2)
 ```
 
 
@@ -71,6 +103,12 @@ fviz_pca_biplot(res.acp,
 repel = TRUE,col.var = "#2E9FDF", # Couleur des variables
 col.ind = "#696969")
 ```
+
+$\underline{\text{Observations}}$
+
+- Les individus feminins obtiennent plus de diplome de Licence,Master et Doctorat dans le domaine de sciences humaines et sociales et Droits sciences politique.
+
+- Les individus masculins obtiennent plus de diplome de Licence , Master et Doctorat dans le domaine de Sciences economiques gestions.
 
 $\underline{\text{Classification hiérarchique ascendante des données}}$
 
@@ -96,16 +134,16 @@ $\text{Methode de K-means}$
 
 ```{r}
 groupes.kmeans <- kmeans(etudiants.cr,centers=4,nstart=5)
-inertie <- rep(0,times=10)
-for (k in 2:10){
-  group <- kmeans(etudiants.cr,centers = k - 1,nstart=5)
+inertie <- rep(0,times=6)
+for (k in 2:6){
+  group <- kmeans(etudiants.cr,centers = k ,nstart=5)
   inertie[k] <- group$betweenss/group$totss
 }
-plot(1:10,inertie,type="b",xlab="Nb. de groupes",ylab="% inertie expliquée")
+plot(1:6,inertie,type="b",xlab="Nb. de groupes",ylab="% inertie expliquée")
 ```
 
 ```{r}
-sol.kmeans <- kmeansruns(etudiants.cr,krange=2:9,criterion="ch")
-plot(2:10,sol.kmeans$crit,type="b",xlab="Nb. de groupes",ylab="Silhouette")
+solkmeans <- kmeansruns(etudiants.cr,krange=2:6,criterion="asw")
+plot(1:6,solkmeans$crit,type="b",xlab="Nb. de groupes",ylab="Silhouette")
 ```
 

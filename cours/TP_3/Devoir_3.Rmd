@@ -120,7 +120,7 @@ $\textbf{Graphe des valeurs propres}$
 fviz_eig(pcaski, addlabels = TRUE, ylim = c(0, 50))
 ```
 
-$\text{Les deux premières composantes principales expliquent}$ 74\% $\text{de la variation, donc les deux premiers axes peuvent etre acceptés}$
+Les deux premières composantes principales expliquent 74% de la variation,donc les deux premiers axes peuvent etre acceptés.
 
 $\text{Graphique des variables}$
 
@@ -152,9 +152,10 @@ fviz_cos2(pcaski, choice = "var", axes = 1 :2)
 
 $\textbf{Interpretations}$
 
-$\text{Un cos2 élevé indique une bonne représentation de la variable sur les axes principaux en considération(comme
-on peut le voir dans le graphe ci dessus), dans ce cas la variable est positionnée à proximité de la circonférence
-du cercle de corrélation.}$
+Un cos2 élevé indique une bonne représentation de la variable sur les axes principaux en considération(comme
+on peut le voir dans le graphe ci dessus),
+dans ce cas la variable est positionnée à proximité de la circonférence
+du cercle de corrélation
 
 ```{r}
 fviz_pca_var(pcaski, col.var = "cos2",gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),repel = TRUE)
