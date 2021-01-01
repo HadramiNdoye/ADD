@@ -16,7 +16,7 @@ library("corrplot")
 library("fpc")
 ```
 
-$\text{Application de CAH et K-means sur laes données Dechathlon}$
+$\text{Application de CAH et K-means sur les données Dechathlon}$
 
 ```{r}
 # chargement des données decathlon2
@@ -36,26 +36,26 @@ plot(clust.dc2)
 rect.hclust(clust.dc2,k=4)
 print(sort(cutree(clust.dc2,k=4)))
 ```
-
+Le dendogramme suggere un decoupage en 4 groupes, nous verrons ensuite la methode de K-means pour trouver le nombre de decoupages (k) optimal afin de confirmer ou rejetter le nombre de decoupages trouvés sur la methode de classification.
 $\text{La methode de K-means}$
 
 ```{r}
 groupes.kmeans <- kmeans(decathlon2.active.cr,centers=4,nstart=5)
 inertie <- rep(0,times=10)
-for (k in 1:10){
+for (k in 2:10){
   group <- kmeans(decathlon2.active.cr,centers = k,nstart=5)
   inertie[k] <- group$betweenss/group$totss
 }
 plot(1:10,inertie,type="b",xlab="Nb. de groupes",ylab="% inertie expliquée")
 ```
 
-```{r}
-sol.kmeans <- kmeansruns(decathlon2.active.cr,krange=2:10,criterion="ch")
-plot(1:10,sol.kmeans$crit,type="b",xlab="Nb. de groupes",ylab="Silhouette")
-```
-$\text{Realisation d'une ACP}$
+Le graphe ci - dessus montre l'evolution de la proportion d’inertie, on constate qu'a partir de k = 4 classes, l’adjonction d’un groupe supplémentaire n’augmente pas «significativement» la part d’inertie expliquée par la partition.
+
+$\text{Construction d'un diagramme d'individus et des variables}$
 
 ```{r}
 res.da <- PCA(decathlon2.active,scale.unit = TRUE,graph = FALSE)
 fviz_pca_biplot(res.da,repel = TRUE,col.var = "#2E9FDF", col.ind = "#696969")
 ```
+
+Le biplot confirme  aussi que les individus peuvent etre regrouper pour former quatre classes. 

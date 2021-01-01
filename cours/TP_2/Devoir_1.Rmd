@@ -1,9 +1,4 @@
 ---
-output:
-  pdf_document: default
-  html_document: default
----
-  ---
 title: "Devoir_2"
 author: "EL_Hadrami"
 date: "10/11/2020"
@@ -138,9 +133,10 @@ df.airquality$season = saison
 
 $7 .$
 
-```{r}
+```{r,warning=FALSE}
 g <- ggplot(data = df.airquality) + 
-  geom_point(mapping = aes(x =Temp, y = Ozone, shape = saison,color=saison)) + scale_shape_manual(values=c(3, 16, 17))+
+  geom_point(mapping = aes(x =Temp, y = Ozone, shape = saison,color=saison)) + 
+  scale_shape_manual(values=c(3, 16, 17))+
   ggtitle("Ozone en fonction des saisons")
 g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
@@ -322,7 +318,7 @@ x <- c(3,6,9,12,15,18,21,24)
 y <- c(20,50,40,70,40,60,50,80)
 reg1 <- lm(x~y)
 plot(x,y)
-abline(reg2)
+abline(reg1)
 ```
 
 ```{r}
@@ -358,17 +354,50 @@ summary(data)
 $\text{Tableau de contigence}$
 
 ```{r}
-tabc1 <- table(data$Sexe,data$Diplome)
-tabc2 <- round(prop.table(tabc1),2)
+datavq <- subset(data,select=c(Sexe,EtatCivil,Diplome,AvisReforme)) 
+tabc1 <- table(datavq)
+tabc2 <- round(tabc1/sum(tabc1),2)
 tabc3 <- tabc2*100
 ```
 $\text{Representation graphique}$
 
 ```{r}
 balloonplot(tabc1)
-ggplot(data=data.frame(tabc1)) + geom_bar(stat="identity",mapping = aes(x = Var2,y = Freq,fill=Var1))+xlab("Diplome") + ylab("Total H/F") + ggtitle("Diagramme en baton")
+barplot(as.matrix(tabc1),beside = TRUE)
 ```
 
+$\textbf{Croisement qualitatif vs qualitatif}$
+
+```{r}
+# distribution marginale
+matfreq <- tabc1 / sum(tabc1)
+dl <- round(apply(matfreq,1,sum),2)
+dl
+dc <- round(apply(matfreq,2,sum),2)
+dc
+# distribution conditionnelle
+DC <- sweep(tabc1,2,colSums(tabc1),"/")
+# test de khi-deux
+dfse <- subset(data,select = c(Sexe,EtatCivil))
+tabdfse <- table(dfse)
+chisq.test(tabdfse)
+# p-value > 0.05 donc pas de dependance significative entre les deux variables
+```
+
+$\textbf{Croisement qualitatif vs quantitatif}$
+
+```{r}
+# Resumé de la variable stress
+s <- data$Stress
+summary(s)
+boxplot(s,col="blue",main="boxplot de la variable Stress")
+datf <- subset(data,select = c(Stress,EtatCivil))
+tabSE <- table(datf) # effectif
+head(tabSE / sum(tabSE),6)
+head(round(tabSE / sum(tabSE),2) * 100)
+chisq.test(tabSE)
+ggplot(datf,aes(EtatCivil, Stress,fill = Stress)) + geom_boxplot()
+```
 
 
 

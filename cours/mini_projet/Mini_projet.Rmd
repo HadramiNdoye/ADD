@@ -1,6 +1,6 @@
 ---
-title: "min_projet"
-author: "EL_Hadrami"
+title: "Mini projet"
+author: "EL Hadrami N'DOYE"
 date: "29/12/2020"
 output: pdf_document
 ---
@@ -21,16 +21,26 @@ library("fpc")
 Soient les noms suivants qui remplacera les variables du jeux de données dans la partie contribution des varaibles
 
 Dsc : Droit, sciences politiques
+
 Seg : Sciences economiques, gestion
+
 Aec : Administration economique et sociale
+
 Lsla : Lettres, sciences du langage, arts
+
 Shs : Sciences humaines et sociales
+
 L : Langues
+
 P2lsh : Pluri lettres langues sciences humaines
+
 Sfa : Sciences fondamentales et applications
+
 Dsp : Droit, sciences politiques
+
 Staps : Sciences et techniques des activites physiques et sportives
 
+$\underline{\text{Pre-traitement}}$
 
 ```{r}
 etudiants <- read.csv("data/etudiants.csv",header = TRUE,sep = ";")
@@ -95,6 +105,12 @@ acp <- PCA(etudiants.active,scale.unit = TRUE,graph = FALSE)
 fviz_contrib(acp, choice = "ind", axes = 1 :2)
 ```
 
+$\underline{\text{Observation:}}$
+
+La ligne en pointillé rouge, sur le graphique ci-dessus, indique la contribution moyenne attendue.
+Donc les individus  qui contribue le plus sont Sfa,Shs,p2lsh cela veut dire qu'il y a plus d'etudiants diplomés dans ces filieres que les autres filieres.
+
+
 
 $\textbf{Graphiques des individus et des variables}$
 
@@ -112,13 +128,18 @@ $\underline{\text{Observations}}$
 
 $\underline{\text{Classification hiérarchique ascendante des données}}$
 
-- Realisation d'un plot pour tous les individus
+- Realisation d'un correlogramme pour toute les variables
 
 ```{r}
-plot(etudiants.active,col = "blue")
+corr <- cor(etudiants.active,method = "pearson")
+corrplot(corr, type="upper", order="hclust", tl.col="black", tl.srt=45)
 ```
 
-$\text{Utilisation de la fonction hclust pour la classification}$
+$\underline{\text{Obsevations}}$
+
+Avant d'entammer la classification on constate deja qu'elle y a une forte correlation entre la variable Doctorat.H et Licence.H puis Doctorat.H et Master.H donc y a une possiblité de regrouper ces trois variables. 
+
+$\textbf{Utilisation de la fonction hclust pour la classification}$
 
 ```{r}
 filiere <- c("Dsp","Seg","Aes","Lsla","L","Shs","p2lsh","Sfa","Snv","Staps")
@@ -127,10 +148,15 @@ etudiants.cr <- scale(etudiants.active,center=T,scale=T)
 d.etudiants <- dist(etudiants.cr)
 tree <- hclust(d.etudiants,method = "ward.D2")
 plot(tree,hang = -1)
-print(sort(cutree(tree,k=6)))
+rect.hclust(tree,k=4)
+print(sort(cutree(tree,k=4)))
 ```
+$\underline{\text{Observations}}$
 
-$\text{Methode de K-means}$
+Le dendogramme suggere un decoupage en 4 groupes, nous verrons ensuite la methode de K-means pour trouver le nombre de decoupages (k) optimal afin de confirmer ou rejetter le nombre de decoupages trouvés sur la methode de classification.
+
+
+$\textbf{Methode de K-means}$
 
 ```{r}
 groupes.kmeans <- kmeans(etudiants.cr,centers=4,nstart=5)
@@ -139,11 +165,16 @@ for (k in 2:6){
   group <- kmeans(etudiants.cr,centers = k ,nstart=5)
   inertie[k] <- group$betweenss/group$totss
 }
-plot(1:6,inertie,type="b",xlab="Nb. de groupes",ylab="% inertie expliquée")
+plot(1:6,inertie,type="b",xlab="Nb. de groupes",ylab="% inertie expliquée",col="blue")
 ```
+
 
 ```{r}
-solkmeans <- kmeansruns(etudiants.cr,krange=2:6,criterion="asw")
-plot(1:6,solkmeans$crit,type="b",xlab="Nb. de groupes",ylab="Silhouette")
+solkmeans <- kmeansruns(etudiants.cr,krange=2:6,criterion="ch")
+plot(1:6,solkmeans$crit,type="b",xlab="Nb. de groupes",ylab="Silhouette",col="red")
 ```
 
+$\underline{\text{Observations}}$
+
+Le graphe 1 montre l'evolution de la proportion d’inertie expliquée par la partition et le graphe 2 cherche a maximiser la valeur k pour la partition en utilisant la fonction kmeansruns du package «fpc».
+Dans le deux graphe on confirme donc que le K optimal est de 6 ce qui montre qu'on a six groupes qui forment des clusters.

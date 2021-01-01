@@ -22,13 +22,6 @@ $\text{Chargement du jeux de données}$
 
 ```{r}
 load("data/chiens.rda")
-# chiendata <- read_xlsx("data/chiens.xlsx",col_names = FALSE)
-# chiendata <- as.matrix(chiendata)
-# chiendata[,1]
-# chiendataextr <- as.matrix(chiendata[,2:8])
-# rownames(chiendataextr) <- chiendata[,1]
-# colnames(chiendataextr) <- c("taille","Poids","Veloc","Intell","Affec","Agress","Role")
-# chiendataextr <- as.data.frame(chiendataextr)
 head(chiens,4)
 class(chiens)
 ```
@@ -38,6 +31,7 @@ $\text{Realisation d'une ACM}$
 H <- chiens[,1:6]
 # tableau disjonctif
 tabd <- tab.disjonctif(H)
+head(tabd,5)
 tabd <- as.matrix(tabd)
 f <- tabd / sum(tabd)
 r <- apply(f,1,sum)

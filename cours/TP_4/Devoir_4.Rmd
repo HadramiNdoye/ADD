@@ -93,7 +93,7 @@ d[1:2]^2/IT*100 #pourcentage d'inertie des axes
 sum(d[1:2]^2/IT)*100#pourcentage d'inertie du plan
 ```
 
-$\text{Les deux premières dimensions de l'AFC donnent}$ 99.51\% $\text{de la variation, donc le premier plan factoriel de L'AFC peut etre acceptés}$
+Les deux premières dimensions de l'AFC donnent 99.51% de la variation, donc le premier plan factoriel de L'AFC peut etre acceptés.
 
 3. Retrouvons ces résultats avec le package FactoMineR et la fonction CA
 
@@ -146,18 +146,16 @@ plot(caw2,col.row.sup=3)
 $\text{Classification ascendante hiérarchique de Ward}$
 
 ```{r}
-#matrice des coordonnees factorielles sur 4 dimensionsX
+#matrice des coordonnees factorielles sur 4 dimensions
 mcf <- rbind(caw2$row$coord[,1:4],caw2$row.sup$coord[,1:4])
 #matrice de distance euclidiennes entre les 17 echantillons
 d <-dist(mcf)
 #CAH
 tree <-hclust(d,method="ward.D2")
 plot(tree,hang=-1)
-```
-
-
-```{r}
+rect.hclust(tree,k=4)
 #partition en 4 classes
 cutree(tree,k=4)
 ```
+
 
