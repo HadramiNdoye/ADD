@@ -38,7 +38,6 @@ diag1 <- diag(1,nrow=9,ncol=9) # creation d'une matrice diagonale
 x1 <- rep(x=1,times=9)
 matrix1 <- matrix(x1,nrow=9,ncol=9)
 matdiag0 <- matrix1 - diag1
-
 ```
 
 $\underline{\text{Exercice 3}}$
@@ -62,7 +61,6 @@ x_extract4 <- x[x > 4.07  || x < 1.48]
 indice_min <- which.min(x)
 ```
 
-$\underline{\text{Exercice 5}}$
 
 ```{r}
 row1A <- c(-2,1,-3,-2)
@@ -79,13 +77,12 @@ B <- matrix(c(rowA,rowB,rowC,rowD),ncol = 4,nrow = 4,byrow = T)
 det(A)
 det(B)
 # det(A) et det(B) ne sont pas nuls donc A et B sont inversible
-# L'inverse des matrices
+# l'inverse des matrices
 solve(A)
 solve(B)
 #2.
 det(t(A))
 det(solve(A))
-# det(A)−1 = 1 / det(A)
 1 / det(A)
 det(A %*% B)
 det(A) * det(B)
@@ -96,5 +93,141 @@ t(A %*% B)
 t(B) %*% t(A)
 solve(A %*% B)
 solve(B) %*% solve(A)
+```
+
+$\underline{\text{Exercice 6}}$
+
+```{r}
+r1 <- c(1,1,3)
+r2 <- c(5,2,6)
+r3 <- c(-2,-1,-3)
+A <- matrix(c(r1,r2,r3),nrow = 3,ncol = 3,byrow = TRUE)
+# 1. 
+A %*% A %*% A
+# Donc A est nilpotent avev n = 3
+# 2 . 
+A[3,] <- A[1,] + A[2,]
+A
+```
+
+$\underline{\text{Exercice 7}}$
+
+```{r}
+# 1. Creation de la  matrice X
+X <- matrix(c(0.5^2, 0.5, 1, 1^2, 1, 1, 1.5^2, 1.5, 1), ncol = 3, byrow = TRUE)
+det(X)
+# donc X est inversible
+# inverse de X
+invX <- solve(X)
+invX
+# determinons a,b et c
+r <- c(1,4,5)
+sol <- invX %*% r
+rownames(sol) <- c("a","b","c")
+sol
+# 4 determination des valeurs propres
+eigen(X)$values # valeurs propres
+eigen(X)$vectors # vecteurs propres
+```
+```{r}
+
+```
+
+
+$\underline{\text{Exercice 8}}$
+
+```{r}
+A <- matrix(0, nrow = 5, ncol = 5)
+B  <- abs(col(A) - row(A)) + 1
+B
+det(B)
+# Donc B est inversible
+# inverse de B
+solve(B)
+# Resolution du systeme
+r <- c(1,rep(2,2),3,2)
+sol <- solve(B) %*% r
+rownames(sol) <- c("a","b","c","d","e")
+sol
+```
+
+$\underline{\text{Exercice 9}}$
+
+```{r}
+x <- 1:6
+y <- 5:10
+xplusy <- x + y
+xplusy[xplusy > 11]
+# produit scalaire de x et y
+prodxy <- x * y
+M <- matrix(1:36, nrow = 6)
+M %*% x # Calcul de M*x
+x %*% M # Calcul de x*M
+M %*% t(M) # Calcul de M*t(M)
+```
+
+$\underline{\text{Exercice 10}}$
+
+```{r}
+# Creation d'une de 16 lignes et trois colonnes
+r <- rep(seq(3,1,by = -1),16)
+A <- matrix(r,nrow = 16,ncol = 3,byrow = TRUE)
+dim(A)
+head(A,5)
+```
+
+$\underline{\text{Exercice 11}}$
+
+```{r}
+Ligne1 <- c(95,68,85,72,55,86,115)
+Ligne2 <- c(189,169,179,167,171,178,179)
+mat <- matrix(c(Ligne1,Ligne2),nrow = 2,ncol=7,byrow = TRUE)
+rownames(mat) <- c("Poids","Taille")
+colnames(mat) <- c("John","Lilly","Stef","Bob","Anna", "Marik","Boris")
+mat
+```
+
+$\underline{\text{Exercice 12}}$
+
+```{r}
+r1A <- c(3,1,sqrt(6))
+r2A <- c(1,3,-sqrt(6))
+r3A <- c(-sqrt(6),sqrt(6),2)
+A <- matrix(c(r1A,r2A,r3A),nrow = 3,ncol = 3,byrow = TRUE)
+A <- 1 / 4 * A
+r1B <- c(-2,-1,2)
+r2B <- c(2,-2,1)
+r3B <- c(1,2,2)
+B <- matrix(c(r1B,r2B,r3B),nrow = 3,ncol = 3,byrow = TRUE)
+B <- 1 / 3 * B
+A %*% t(A)
+# donc A est orthogonal
+#2.verifions que inv(A)=t(A)
+solve(A)
+t(A)
+# 3. Montrons que B est orthogonal
+B %*% t(B)
+# 4. Est ce que  que A et B commutent
+ab <- A %*% B
+ba <- B %*% A
+ab - ba
+# Donc A et B ne commute pas
+# 5. Le determinant de A
+det(A)
+# 6. Valeurs et vecteurs propres de A
+vpA <- eigen(A)$values
+vpA
+vectpA <- eigen(A)$vectors
+vectpA
+vpB <- eigen(B)$values
+vpB
+vectpB <- eigen(B)$vectors
+vectpB
+# 7. Creation d'une nouvelle matrice
+C <- A
+C[3,] <- C[1,] + C[2,]
+C
+det(C)
+# Donc C n'est pas inversible
 ```
 

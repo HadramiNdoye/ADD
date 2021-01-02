@@ -40,7 +40,7 @@ Dsp : Droit, sciences politiques
 
 Staps : Sciences et techniques des activites physiques et sportives
 
-$\underline{\text{Pre-traitement}}$
+$\textbf{Pre-traitement}$
 
 ```{r}
 etudiants <- read.csv("data/etudiants.csv",header = TRUE,sep = ";")
@@ -51,6 +51,13 @@ etudiants.active <- as.data.frame(etudiants[,1:6])
 head(etudiants.active,4)
 summary(etudiants.active)
 ```
+
+$\textbf{Realisation d'un test de Khi-deux}$
+
+```{r}
+chisq.test(etudiants.active)
+```
+Le test de khi-deux donne un p-value < 0.05 donc elle y a une dependance significative entre les variables sur les differents individus
 
 $\textbf{Realisation d'une ACP}$
 

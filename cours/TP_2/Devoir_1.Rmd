@@ -13,6 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readxl)
 library(gplots)
+library(MASS)
+library(car)
 ```
 
 
@@ -88,7 +90,7 @@ $\textbf{Question 8.}$: Les parametres statistiques de la variable ww
 summary(ww)
 ```
 
-$\underline{\text{Exercice 15.}}$
+$\underline{\text{Exercice 15}}$
 
 $1.\\$
 ```{r}
@@ -236,8 +238,12 @@ tableau <- as.table(tableau)
 
 2.
 ```{r}
-print(tableau)
-barplot(tableau)
+tableau
+tabdf <-data.frame(tableau)
+MC <- tabdf$Var1
+g <- ggplot(tabdf) + geom_bar(stat="identity",mapping=aes(x = Var2,y = Freq,fill = MC)) + 
+  xlab("Couleur des yeux") + ylab("Marie/Celib") + ggtitle("Diagramme en baton")
+g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
 3. 
@@ -301,13 +307,46 @@ reg <- lm(dist~speed,cars)
 summary(reg)
 plot(cars)
 abline(reg,col="red")
-#abline(reg$coefficients,col="yellow")
 ```
 $\text{19.a: La valeur prédite pour une vitesse de 20}$
 
 ```{r}
 predict(reg,newdata = data.frame(speed=20))
 ```
+$\text{Jeux de données cpus}$
+
+```{r}
+data(cpus)
+head(cpus)
+summary(cpus)
+```
+$\text{comportement des variables les unes par rapport aux autres}$
+
+On utilise la commande plot
+
+```{r}
+plot(cpus,col="red")
+```
+
+$\text{Regression lineaire multiples}$
+
+```{r}
+regm <- lm(perf~syct+mmin+mmax+cach+chmin+chmax+estperf,cpus)
+names(regm)
+summary(regm)
+```
+Apres avoir fait le summary on remarque que les variables les pertinentes sont ceux qui sont les plus significatives au seuil $\alpha=0.05$ donc ces variables sont :
+
+- estperf
+- chmax
+- cach
+
+Les commandes stepAIC,addterm et dropterm peuvent etre utiliser aussi pour trouver les variables pertinentes.
+
+```{r}
+stepAIC(regm)
+```
+
 
 $\underline{\text{Exercice 20}}$
 
@@ -316,23 +355,20 @@ $\text{declaration des données}$
 ```{r}
 x <- c(3,6,9,12,15,18,21,24)
 y <- c(20,50,40,70,40,60,50,80)
-reg1 <- lm(x~y)
-plot(x,y)
-abline(reg1)
 ```
 
 ```{r}
-reg2 <- lm(x~y)
-plot(y,x)
-abline(reg2)
-```
-le coefficient de correlation entre x et y
-
-```{r}
+# Coefficient de correlation
 cor(x,y)
+# Methode de fisher
 fisher.test(x,y)
 ```
 
+```{r}
+reg <- lm(y~x)
+plot(x,y)
+abline(reg,col="red")
+```
 
 $\underline{\text{Exercice 21}}$
 
@@ -396,8 +432,90 @@ tabSE <- table(datf) # effectif
 head(tabSE / sum(tabSE),6)
 head(round(tabSE / sum(tabSE),2) * 100)
 chisq.test(tabSE)
-ggplot(datf,aes(EtatCivil, Stress,fill = Stress)) + geom_boxplot()
+```
+$\text{e.}$
+
+```{r}
+# Realisation d'un boxplot
+g <- ggplot(datf) + geom_boxplot(aes(x = EtatCivil, y = Stress, fill = EtatCivil)) + 
+  ggtitle("Boxplot entre la variable Stress et EtatCivil")
+g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
+```
+On remarque qu'il y a plus d'individus mariés car ils ont la moyenne la plus elevés et autant d'individus celibataires que divorcés car leurs moyennes sont identiques et moins d'individus Veufs.
+
+$\text{f.}$
+
+```{r}
+g <- ggplot(datf) + geom_histogram(stat="identity",aes(x = EtatCivil, y = Stress, fill = EtatCivil)) + 
+  ggtitle("Histogramme entre la variable Stress et EtatCivil")
+g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
+$\text{g.}$
+
+```{r}
+head(datf)
+```
+
+$\textbf{6.Croisement quantitatif vs quantitatif}$
 
 
+```{r}
+dfas <- subset(data,select = c(Age,Satisfaction))
+summary(dfas)
+boxplot(dfas$Satisfaction,xlab="Satisfaction",main="Boxplot pour la variable Satisfaction")
+```
+
+$\text{Tableau de contingence}$
+
+```{r}
+# tableau des effectifs
+tabcas <- table(dfas)
+# tableau de frequence
+tabfreq <- tabcas / sum(tabcas)
+tabfreqp <- round(tabfreq * 100,2)
+```
+
+$\text{Nuage de point }$
+
+```{r}
+g <- ggplot(dfas) + geom_point(stat="identity",aes(x = Age, y = Satisfaction)) + 
+  ggtitle("Nuage de point de la variable Satisfaction en fonction de l'age")
+g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
+```
+
+$\text{m.}$
+
+```{r}
+spl <- split(dfas,data$Sexe)
+dim(spl$Homme)
+dim(spl$Femme)
+plot(spl$Homme,col="red",pch=20)
+points(spl$Femme,col="blue",pch=17)
+legend(45,15,c("Homme","Femme"),col=c("red","blue"),pch = c(20,17))
+```
+
+$\text{n}$
+
+```{r}
+# taille des echantillons
+n <- length(dfas$Age)
+X <- dfas$Age
+Y <- dfas$Satisfaction 
+covobs <- sum((X - mean(X)) * (Y - mean(Y))) / (n - 1)
+covobs
+cov(X,Y)
+# Correlation
+num <-  (1 / (n - 1)) * sum((X - mean(X)) * (Y - mean(Y)))
+denom <- sqrt(((1 / (n - 1)) * sum((X - mean(X))^2)) * ((1 / (n - 1)) * sum((Y - mean(Y))^2)))
+corobs <- num / denom
+corobs
+cor(X,Y)
+# Matrice de correlation 
+dfcorr <- subset(data,select = c(Age,Anciennete,Salaire,Satisfaction,Stress,EstimeSoi))
+matcorr <- cor(dfcorr)
+scatterplotMatrix(matcorr)
+```
+
+Le graphe  montre les correlations possibles sur les differentes variablees, par exemple les variables Age et Anciennete
+sont correlés positivement.
