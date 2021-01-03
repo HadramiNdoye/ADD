@@ -1,6 +1,6 @@
 ---
 title: "Devoir_5"
-author: "EL_Hadrami"
+author: "EL Hadrami N'DOYE"
 date: "27/12/2020"
 output: pdf_document
 ---
@@ -16,19 +16,28 @@ library("corrplot")
 library("ca")
 library("readxl")
 library("missMDA")
+library("tinytex")
 ```
 
-$\text{Chargement du jeux de données}$
+$\underline{\text{Exercice 27}}$
+
+$\textbf{1. Chargement du jeux de données}$
 
 ```{r}
 load("data/chiens.rda")
 head(chiens,4)
 class(chiens)
 ```
-$\text{Realisation d'une ACM}$
+
+$\textbf{2. Creation d'une matrice H}$
 
 ```{r}
 H <- chiens[,1:6]
+```
+
+$\textbf{3. Realisation d'une ACM}$
+
+```{r}
 # tableau disjonctif
 tabd <- tab.disjonctif(H)
 head(tabd,5)
@@ -44,7 +53,7 @@ V <- gsvd(Z,r,c)$V
 d <- gsvd(Z,r,c)$d
 ```
 
-$\text{3.b}$
+$\text{3.b: Montrons que l'inertie total vaut toujours}\ \frac{m}{p}-1$
 
 ```{r}
 # inertie totale
@@ -57,7 +66,7 @@ p <- ncol(H)
 
 $\text{Ce qui montre que l'inertie total vaut} \ \frac{m}{p} - 1 \ \text{avec m le nombre de modalité et p le nombre de variable qualitative}$
 
-$\text{3.c}$
+$\text{3.c : Vérifions également que le nombre maximum de dimension de cette ACM vaut bien}\ \min(n-1,m-p)$
 
 ```{r}
 d # les valeurs propres sur chaque dimension
@@ -66,14 +75,15 @@ n <- nrow(H)
 min(n - 1, m - p)
 ```
 
-$\text{3.d}$
+$\text{3.d: Digramme en barre de pourcentage d'inertie}$
 
 ```{r}
 pi <- d^2/it*100 #pourcentage d'inertie des axes
-barplot(pi,names.arg=1:length(d),xlab="dim",ylab="pourcentage d'inertie expliquée",col="blue",main="diagramme en barre de pourcentage d'inertie")
+barplot(pi,names.arg=1:length(d),xlab="dim",ylab="pourcentage d'inertie expliquée",
+col="blue",main="diagramme en barre de pourcentage d'inertie")
 ```
 
-$\text{3.e}$
+$\text{3.e : Determinations des matrices X et Y}$
 
 ```{r}
 X <- sweep(U,2,d,'*')
@@ -84,7 +94,7 @@ rownames(X) <- as.matrix(rownames(chiens))
 rownames(Y) <- as.matrix(colnames(tabd))
 ```
 
-$\textbf{3.f plot des individus et des modalités dans le premier plan factoriel}$
+$\text{3.f plot des individus et des modalités dans le premier plan factoriel}$
 
 ```{r}
 xmin <-min(X[,1])
@@ -97,18 +107,20 @@ pi2dim <- d[1:2]^2/it*100
 pi2dim <- round(pi2dim,2)
 xlab <- paste("Dim ", 1, " (", pi2dim[1], "%)", sep = "")
 ylab <- paste("Dim ", 2, " (", pi2dim[2], "%)", sep = "")
-plot(X[,1:2],xlab=xlab,ylab= ylab,xlim=xlim,ylim=ylim,col="blue",pch=20,main="Premier plan factoriel")
+plot(X[,1:2],xlab=xlab,ylab= ylab,xlim=xlim,ylim=ylim,col="blue",
+pch=20,main="Premier plan factoriel")
 abline(v = 0, lty = 2)
 abline(h = 0, lty = 2)
 text(X[,1:2],rownames(chiens),col="blue",pos=3)
-plot(Y[,1:2],xlab=xlab,ylab= ylab,xlim=xlim,ylim=ylim,col="blue",pch=17,main="Premier plan factoriel")
+plot(Y[,1:2],xlab=xlab,ylab= ylab,xlim=xlim,ylim=ylim,col="blue",
+pch=17,main="Premier plan factoriel")
 abline(v = 0, lty = 2)
 abline(h = 0, lty = 2)
 text(Y[,1:2],colnames(tabd),col="blue",pos=3)
 ```
 
 
-$\text{3.g}$
+$\text{3.g : Relation quasi-barycentrique}$
 
 ```{r}
 moy <- apply(X[which(tabd[,3]==1),],2,mean)
@@ -117,10 +129,12 @@ moy <- apply(X[which(tabd[,3]==1),],2,mean)
 Y[3,]
 ```
 
-$\text{3.h:Rapport de correlation entre la variable taille et les deux premieres composantes principale}$
+$\text{3.h : Rapport de correlation entre la variable taille et les deux premieres composantes principale}$
 
 ```{r} 
 eta <- function(x) {
+  # x : une variable contenant dim1 ou dim2
+  # rappcorr : rapport de correlation
   # taille de l'echantillon du premier composante pour chaque modalité de la varoable taille
   ns <- tapply(x, chiens$taille, "length")
   xbarres <-  tapply(x, chiens$taille, "mean")
@@ -137,15 +151,15 @@ eta(xc1)
 eta(xc2)
 ```
 
-$\text{4}$
+$\textbf{4 : MCA du package FactoMineR}$
 
-$\text{4.a:Realisation d'une ACM}$
+$\text{4.a : Realisation d'une ACM}$
 
 ```{r}
 acmchiens <- MCA(chiens,quali.sup = 7,graph = FALSE)
 ```
 
-$\text{4.b}$
+$\text{4.b : Retrouvons les resultas numeriques et les graphique de la question 2 }$
 
 ```{r}
 head(acmchiens$ind$coord,4)
@@ -156,24 +170,29 @@ plot(acmchiens,choix="ind",invisible = c("var","quali.sup"))
 plot(acmchiens,choix="ind",invisible="ind")
 ```
 
-$\text{4.c}$
+$\text{4.c : Retrouvons les rapports de correlations}$
 
 ```{r}
 acmchiens$var$eta[,1:2]
 plot(acmchiens,choix = "var")
 ```
 
-$\text{4.d}$
+$\text{4.d : Metrre des données manquantes sur le jeux de données }$
 
 ```{r}
 chienNA <- H
 chienNA[1,1] <- NA
 chienNA[2,2] <- NA
+```
+
+$\text{4.e : ACM sur des données manquantes }$
+```{r}
 mcachienna <- MCA(chienNA,graph = FALSE)
 plot(mcachienna,choix = "ind",invisible = "ind")
 ```
 
-$\text{5.}$
+
+$\textbf{5 : Comparaison de L'ACM et AFC}$
 
 ```{r}
 Htp <- subset(H,select = c(taille,poids))
@@ -181,6 +200,7 @@ Htptabc <- table(Htp)
 # Realisation d'une AFC
 afctp <- CA(Htptabc,graph = FALSE)
 pt <- subset(chiens,select = c(taille,poids))
+# Realisation d'une ACM
 ptafc <- MCA(pt,graph = FALSE)
 # valeur propre de l'ACF
 vpafc <- afctp$eig
@@ -196,7 +216,7 @@ $\text{Ce qui montre que chaque valeur propre de L'ACF correspond a deux
 valeurs propres de L'ACM}$
 
 
-$\text{Exercice 28}$
+$\underline{\text{Exercice 28}}$
 
 ```{r}
 # chargement du jeux de données vnf

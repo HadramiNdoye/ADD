@@ -18,7 +18,7 @@ library("corrplot")
 library("fpc")
 ```
 
-Soient les noms suivants qui remplacera les variables du jeux de données dans la partie contribution des varaibles
+Soient les noms suivants qui remplaceronts les variables du jeux de données dans la partie contribution des varaibles
 
 Dsc : Droit, sciences politiques
 
@@ -47,6 +47,8 @@ etudiants <- read.csv("data/etudiants.csv",header = TRUE,sep = ";")
 filiere <- etudiants[,1]
 etudiants <- as.matrix(etudiants[2:13])
 rownames(etudiants) <- filiere
+head(etudiants,4)
+# Suppressions des variables inutiles  pour L'ACP
 etudiants.active <- as.data.frame(etudiants[,1:6])
 head(etudiants.active,4)
 summary(etudiants.active)
@@ -62,7 +64,6 @@ Le test de khi-deux donne un p-value < 0.05 donc elle y a une dependance signifi
 $\textbf{Realisation d'une ACP}$
 
 ```{r}
-#etudiants.active <- etudiants[,2:12]
 res.acp <- PCA(etudiants.active,scale.unit = TRUE,graph = FALSE)
 res.acp$eig
 ```
@@ -88,7 +89,8 @@ Donc les variables les plus contributives sont Master.H,Licence.F,Licence.H,Doct
 $\textbf{Graphiques des individus}$
 
 ```{r}
-fviz_pca_ind (res.acp, col.ind = "cos2",gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),repel = TRUE) 
+fviz_pca_ind (res.acp, col.ind = "cos2",gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+repel = TRUE) 
 ```
 
 $\underline{\text{Observation:}}$
@@ -115,7 +117,7 @@ fviz_contrib(acp, choice = "ind", axes = 1 :2)
 $\underline{\text{Observation:}}$
 
 La ligne en pointillé rouge, sur le graphique ci-dessus, indique la contribution moyenne attendue.
-Donc les individus  qui contribue le plus sont Sfa,Shs,p2lsh cela veut dire qu'il y a plus d'etudiants diplomés dans ces filieres que les autres filieres.
+Donc les individus  qui contribue les plus sont Sfa,Shs,p2lsh, cela veut dire qu'il y a plus d'etudiants diplomés dans ces filieres que les autres filieres.
 
 
 
@@ -123,8 +125,7 @@ $\textbf{Graphiques des individus et des variables}$
 
 ```{r}
 fviz_pca_biplot(res.acp,
-repel = TRUE,col.var = "#2E9FDF", # Couleur des variables
-col.ind = "#696969")
+repel = TRUE,col.var = "#2E9FDF", col.ind = "#696969")
 ```
 
 $\underline{\text{Observations}}$
@@ -184,4 +185,4 @@ plot(1:6,solkmeans$crit,type="b",xlab="Nb. de groupes",ylab="Silhouette",col="re
 $\underline{\text{Observations}}$
 
 Le graphe 1 montre l'evolution de la proportion d’inertie expliquée par la partition et le graphe 2 cherche a maximiser la valeur k pour la partition en utilisant la fonction kmeansruns du package «fpc».
-Dans le deux graphe on confirme donc que le K optimal est de 6 ce qui montre qu'on a six groupes qui forment des clusters.
+Dans le deux graphes on confirme donc que le K optimal est de 6 ce qui montre qu'on a six groupes.

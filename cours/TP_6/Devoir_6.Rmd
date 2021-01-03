@@ -1,6 +1,6 @@
 ---
 title: "Devoir_6"
-author: "EL_Hadrami"
+author: "EL Hadrami N'DOYE"
 date: "30/12/2020"
 output: pdf_document
 ---
@@ -21,6 +21,7 @@ $\text{Application de CAH et K-means sur les données Dechathlon}$
 ```{r}
 # chargement des données decathlon2
 data("decathlon2")
+# Les variables actives
 decathlon2.active <- decathlon2[1:23,1:10]
 head(decathlon2.active,4)
 summary(decathlon2.active)
@@ -36,7 +37,9 @@ plot(clust.dc2)
 rect.hclust(clust.dc2,k=4)
 print(sort(cutree(clust.dc2,k=4)))
 ```
+
 Le dendogramme suggere un decoupage en 4 groupes, nous verrons ensuite la methode de K-means pour trouver le nombre de decoupages (k) optimal afin de confirmer ou rejetter le nombre de decoupages trouvés sur la methode de classification.
+
 $\text{La methode de K-means}$
 
 ```{r}

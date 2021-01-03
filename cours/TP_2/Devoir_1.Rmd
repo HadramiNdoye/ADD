@@ -1,6 +1,6 @@
 ---
 title: "Devoir_2"
-author: "EL_Hadrami"
+author: "EL Hadrami N'DOYE"
 date: "10/11/2020"
 output: pdf_document
 ---
@@ -92,51 +92,51 @@ summary(ww)
 
 $\underline{\text{Exercice 15}}$
 
-$1.\\$
+$15.1 : \text{Chargement du jeux de données}$
 ```{r}
 data(airquality) # charger les donées airquality  
-df.airquality <- data.frame(airquality)
 ```
 
-$2. \text{Affichage des noms des variables}$
+$15.2 \text{Affichage des noms des variables}$
 ```{r}
-names(df.airquality)
+names(airquality)
 ```
 
-$3 .\text{nombre de ligne et de colonne}$
+$15.3 : \text{Nombre de ligne et de colonne}$
 
 ```{r}
-nrow(df.airquality)
-ncol(df.airquality)
+nrow(airquality)
+ncol(airquality)
 ```
 
-$4 .\text{Les parametres statistiques}$
+$15.4: \text{Les parametres statistiques}$
 
 ```{r}
-summary(df.airquality)
+summary(airquality)
 ```
-$5 .\text{representation de la boite a moustache}$
+$15.5:\text{representation de la boite a moustache}$
 
 ```{r}
-boxplot(df.airquality$Ozone~df.airquality$Month)
+couleur <- c("red","blue","green","pink","white")
+boxplot(Ozone~Month,airquality,col = couleur)
 ```
 
-$6 .\text{Creation d'une variable qualitative "saison"}$
+$15.6:\text{Creation d'une variable qualitative "saison"}$
 
 ```{r}
-saison <-factor(df.airquality$Month,levels=c(5:9))
+saison <-factor(airquality$Month,levels=c(5:9))
 levels(saison)[levels(saison)==5] <- "printemps"
 levels(saison)[levels(saison)==6] <- "éte"
 levels(saison)[levels(saison)==7] <- "éte"
 levels(saison)[levels(saison)==8] <- "éte"
 levels(saison)[levels(saison)==9] <- "automne"
-df.airquality$season = saison
+airquality$season = saison
 ```
 
-$7 .$
+$15.7 : \text{Propositions des commandes R permettant d’obtenir le graphe indiqué}$
 
 ```{r,warning=FALSE}
-g <- ggplot(data = df.airquality) + 
+g <- ggplot(data = airquality) + 
   geom_point(mapping = aes(x =Temp, y = Ozone, shape = saison,color=saison)) + 
   scale_shape_manual(values=c(3, 16, 17))+
   ggtitle("Ozone en fonction des saisons")
@@ -228,7 +228,8 @@ t <- round((matfreq - (l%*%t(c))) / (l%*%t(c)),2)
 
 $\textbf{Exercice 18}$
 
-1.
+1. $\text{Creation des variables}$
+
 ```{r}
 tableau <- matrix(c(290,410,110,190), ncol=2, byrow=TRUE)
 colnames(tableau) <- c("Bleu","Brun")
@@ -236,7 +237,8 @@ rownames(tableau) <- c("Celib","Marie")
 tableau <- as.table(tableau)
 ```
 
-2.
+2. $\text{Le contenu de la variable tableau et representation graphique}$
+
 ```{r}
 tableau
 tabdf <-data.frame(tableau)
@@ -246,7 +248,7 @@ g <- ggplot(tabdf) + geom_bar(stat="identity",mapping=aes(x = Var2,y = Freq,fill
 g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
-3. 
+3. $\text{Executions de certaines commandes}$
 ```{r}
 n <- margin.table(tableau)
 m1 <- margin.table(tableau,1)
@@ -258,18 +260,20 @@ prop.table(tableau)
 ```{r}
 chisq.test(tableau)
 ```
-4.a
+4.a $\text{Creation des variables}$
 ```{r}
 tab0 <- as.array(m1) %*% t(as.array(m2))/n
 tab0 <- as.table(tab0)
 ```
 
-4.b
+4.b $\text{Creation des variables}$
 
 ```{r}
+summary(tableau)
+summary(tab0)
 ```
 
-5.b
+5.b $\text{Creation des variables}$
 
 ```{r}
 tab1 <- as.matrix(tableau)
@@ -308,11 +312,13 @@ summary(reg)
 plot(cars)
 abline(reg,col="red")
 ```
+
 $\text{19.a: La valeur prédite pour une vitesse de 20}$
 
 ```{r}
 predict(reg,newdata = data.frame(speed=20))
 ```
+
 $\text{Jeux de données cpus}$
 
 ```{r}
@@ -335,6 +341,7 @@ regm <- lm(perf~syct+mmin+mmax+cach+chmin+chmax+estperf,cpus)
 names(regm)
 summary(regm)
 ```
+
 Apres avoir fait le summary on remarque que les variables les pertinentes sont ceux qui sont les plus significatives au seuil $\alpha=0.05$ donc ces variables sont :
 
 - estperf
@@ -433,7 +440,7 @@ head(tabSE / sum(tabSE),6)
 head(round(tabSE / sum(tabSE),2) * 100)
 chisq.test(tabSE)
 ```
-$\text{e.}$
+$\text{e.Realisation d'un boxplot}$
 
 ```{r}
 # Realisation d'un boxplot
@@ -443,7 +450,7 @@ g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 On remarque qu'il y a plus d'individus mariés car ils ont la moyenne la plus elevés et autant d'individus celibataires que divorcés car leurs moyennes sont identiques et moins d'individus Veufs.
 
-$\text{f.}$
+$\text{f.Construction d'un histogramme}$
 
 ```{r}
 g <- ggplot(datf) + geom_histogram(stat="identity",aes(x = EtatCivil, y = Stress, fill = EtatCivil)) + 
@@ -451,7 +458,7 @@ g <- ggplot(datf) + geom_histogram(stat="identity",aes(x = EtatCivil, y = Stress
 g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
-$\text{g.}$
+$\text{g. Resumé de la variable Stress en fonction de la variable EtatCivil}$
 
 ```{r}
 head(datf)
@@ -484,7 +491,7 @@ g <- ggplot(dfas) + geom_point(stat="identity",aes(x = Age, y = Satisfaction)) +
 g + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
-$\text{m.}$
+$\text{m. La fonction split}$
 
 ```{r}
 spl <- split(dfas,data$Sexe)
@@ -495,7 +502,7 @@ points(spl$Femme,col="blue",pch=17)
 legend(45,15,c("Homme","Femme"),col=c("red","blue"),pch = c(20,17))
 ```
 
-$\text{n}$
+$\text{ Calcul de la covariance,correlation et realisation d'un ScatterplotMatrix}$
 
 ```{r}
 # taille des echantillons
@@ -505,7 +512,7 @@ Y <- dfas$Satisfaction
 covobs <- sum((X - mean(X)) * (Y - mean(Y))) / (n - 1)
 covobs
 cov(X,Y)
-# Correlation
+# Correlation 
 num <-  (1 / (n - 1)) * sum((X - mean(X)) * (Y - mean(Y)))
 denom <- sqrt(((1 / (n - 1)) * sum((X - mean(X))^2)) * ((1 / (n - 1)) * sum((Y - mean(Y))^2)))
 corobs <- num / denom
